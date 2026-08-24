@@ -47,3 +47,12 @@ export const updateProduct = async (
 
   return response.data.data;
 };
+
+// Delete product
+export const deleteProduct = async (
+  id: string
+): Promise<Product> => {
+  const response = await api.delete(`/products/${id}`);
+
+  return response.data.data;
+};
