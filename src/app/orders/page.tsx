@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getMyOrders, Order } from "@/services/orders";
+import { createReview } from "@/services/reviews";
 import { useRouter } from "next/navigation";
 
 export default function OrdersPage() {
@@ -10,6 +11,14 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [reviewingOrder, setReviewingOrder] =
+    useState<Order | null>(null);
+
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] =
+    useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -38,10 +47,61 @@ export default function OrdersPage() {
     loadOrders();
   }, [router]);
 
+  const handleReview = (order: Order) => {
+    setReviewingOrder(order);
+    setReviewRating(5);
+    setReviewComment("");
+  };
+
+  const handleCreateReview = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    if (!reviewingOrder) return;
+
+    if (reviewRating < 1 || reviewRating > 5) {
+      alert("Rating must be between 1 and 5.");
+      return;
+    }
+
+    if (!reviewComment.trim()) {
+      alert("Please write a comment.");
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+
+      await createReview({
+        productId: reviewingOrder.productId,
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+      });
+
+      alert("Review created successfully!");
+
+      setReviewingOrder(null);
+      setReviewRating(5);
+      setReviewComment("");
+    } catch (error: any) {
+      console.error("Review error:", error);
+
+      alert(
+        error?.response?.data?.message ||
+          "Failed to create review"
+      );
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <p className="text-lg text-gray-600">Loading orders...</p>
+        <p className="text-lg text-gray-600">
+          Loading orders...
+        </p>
       </main>
     );
   }
@@ -78,7 +138,8 @@ export default function OrdersPage() {
             </h2>
 
             <p className="mt-2 text-gray-500">
-              Your orders will appear here after you place an order.
+              Your orders will appear here after you place an
+              order.
             </p>
 
             <button
@@ -139,12 +200,112 @@ export default function OrdersPage() {
                   </span>
                 </div>
 
-                <div className="mt-5 border-t pt-4 text-sm text-gray-500">
-                  Ordered:{" "}
-                  {new Date(order.createdAt).toLocaleString()}
+                <div className="mt-5 flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm text-gray-500">
+                    Ordered:{" "}
+                    {new Date(order.createdAt).toLocaleString()}
+                  </p>
+
+                  <button
+                    onClick={() => handleReview(order)}
+                    disabled={
+                      order.status === "Cancelled"
+                    }
+                    className="rounded-lg bg-purple-600 px-4 py-2 font-semibold text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-gray-300"
+                  >
+                    Write Review
+                  </button>
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Review Modal */}
+        {reviewingOrder && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+            <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+              <h2 className="mb-2 text-2xl font-bold text-gray-800">
+                Write Review
+              </h2>
+
+              <p className="mb-6 text-gray-500">
+                {reviewingOrder.product?.title || "Product"}
+              </p>
+
+              <form
+                onSubmit={handleCreateReview}
+                className="space-y-5"
+              >
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                    Rating
+                  </label>
+
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((rating) => (
+                      <button
+                        key={rating}
+                        type="button"
+                        onClick={() =>
+                          setReviewRating(rating)
+                        }
+                        className={`h-10 w-10 rounded-lg border font-semibold ${
+                          reviewRating === rating
+                            ? "bg-purple-600 text-white"
+                            : "bg-white text-gray-700 hover:bg-purple-100"
+                        }`}
+                      >
+                        {rating}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="review-comment"
+                    className="mb-2 block text-sm font-medium text-gray-700"
+                  >
+                    Comment
+                  </label>
+
+                  <textarea
+                    id="review-comment"
+                    value={reviewComment}
+                    onChange={(event) =>
+                      setReviewComment(event.target.value)
+                    }
+                    placeholder="Write your review..."
+                    rows={4}
+                    required
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-purple-500"
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setReviewingOrder(null)
+                    }
+                    className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 font-semibold text-gray-700 hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={submittingReview}
+                    className="flex-1 rounded-lg bg-purple-600 px-4 py-2.5 font-semibold text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {submittingReview
+                      ? "Submitting..."
+                      : "Submit Review"}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>

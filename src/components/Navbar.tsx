@@ -31,6 +31,7 @@ export default function Navbar() {
   return (
     <nav className="border-b bg-white shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        {/* Logo */}
         <Link
           href="/products"
           className="text-2xl font-bold text-blue-600"
@@ -39,6 +40,7 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-6">
+          {/* Products */}
           <Link
             href="/products"
             className="text-gray-700 hover:text-blue-600"
@@ -46,6 +48,7 @@ export default function Navbar() {
             Products
           </Link>
 
+          {/* My Orders */}
           {user && (
             <Link
               href="/orders"
@@ -55,6 +58,15 @@ export default function Navbar() {
             </Link>
           )}
 
+          {/* Reviews */}
+          <Link
+            href="/reviews"
+            className="text-gray-700 hover:text-blue-600"
+          >
+            Reviews
+          </Link>
+
+          {/* Admin */}
           {user?.role === "Admin" && (
             <Link
               href="/admin"
@@ -64,6 +76,7 @@ export default function Navbar() {
             </Link>
           )}
 
+          {/* Manager */}
           {user?.role === "Manager" && (
             <Link
               href="/manager"
@@ -73,6 +86,7 @@ export default function Navbar() {
             </Link>
           )}
 
+          {/* User Info + Logout */}
           {user ? (
             <div className="flex items-center gap-3">
               <div className="text-right">
