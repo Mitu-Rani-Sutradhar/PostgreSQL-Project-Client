@@ -39,11 +39,12 @@ export default function Navbar() {
           ShopApp
         </Link>
 
+        {/* Navigation */}
         <div className="flex items-center gap-6">
           {/* Products */}
           <Link
             href="/products"
-            className="text-gray-700 hover:text-blue-600"
+            className="font-medium text-gray-700 transition hover:text-blue-600"
           >
             Products
           </Link>
@@ -52,7 +53,7 @@ export default function Navbar() {
           {user && (
             <Link
               href="/orders"
-              className="text-gray-700 hover:text-blue-600"
+              className="font-medium text-gray-700 transition hover:text-blue-600"
             >
               My Orders
             </Link>
@@ -61,35 +62,53 @@ export default function Navbar() {
           {/* Reviews */}
           <Link
             href="/reviews"
-            className="text-gray-700 hover:text-blue-600"
+            className="font-medium text-gray-700 transition hover:text-blue-600"
           >
             Reviews
           </Link>
 
           {/* Admin */}
           {user?.role === "Admin" && (
-            <Link
-              href="/admin"
-              className="text-gray-700 hover:text-blue-600"
-            >
-              Admin
-            </Link>
+            <>
+              <Link
+                href="/admin"
+                className="font-medium text-gray-700 transition hover:text-blue-600"
+              >
+                Admin
+              </Link>
+
+              <Link
+                href="/admin/orders"
+                className="font-medium text-gray-700 transition hover:text-blue-600"
+              >
+                Manage Orders
+              </Link>
+            </>
           )}
 
           {/* Manager */}
           {user?.role === "Manager" && (
-            <Link
-              href="/manager"
-              className="text-gray-700 hover:text-blue-600"
-            >
-              Manager
-            </Link>
+            <>
+              <Link
+                href="/manager"
+                className="font-medium text-gray-700 transition hover:text-blue-600"
+              >
+                Manager
+              </Link>
+
+              <Link
+                href="/admin/orders"
+                className="font-medium text-gray-700 transition hover:text-blue-600"
+              >
+                Manage Orders
+              </Link>
+            </>
           )}
 
-          {/* User Info + Logout */}
+          {/* User / Logout */}
           {user ? (
             <div className="flex items-center gap-3">
-              <div className="text-right">
+              <div className="hidden text-right sm:block">
                 <p className="text-sm font-semibold text-gray-800">
                   {user.name}
                 </p>
@@ -101,7 +120,7 @@ export default function Navbar() {
 
               <button
                 onClick={handleLogout}
-                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
                 Logout
               </button>
@@ -109,7 +128,7 @@ export default function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
             >
               Login
             </Link>

@@ -1,3 +1,4 @@
+
 import api from "./api";
 
 export interface Review {
@@ -9,10 +10,19 @@ export interface Review {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
+
   user?: {
     id: string;
     name: string;
     email: string;
+  };
+
+  product?: {
+    id: string;
+    title: string;
+    description?: string;
+    price: number;
+    stock?: number;
   };
 }
 
@@ -27,14 +37,18 @@ export interface UpdateReviewData {
   comment?: string;
 }
 
-// Get reviews
+// =========================
+// Get All Reviews
+// =========================
 export const getReviews = async (): Promise<Review[]> => {
   const response = await api.get("/reviews");
 
   return response.data.data;
 };
 
-// Create review
+// =========================
+// Create Review
+// =========================
 export const createReview = async (
   data: CreateReviewData
 ): Promise<Review> => {
@@ -43,7 +57,9 @@ export const createReview = async (
   return response.data.data;
 };
 
-// Update review
+// =========================
+// Update Review
+// =========================
 export const updateReview = async (
   id: string,
   data: UpdateReviewData
@@ -53,7 +69,9 @@ export const updateReview = async (
   return response.data.data;
 };
 
-// Delete review
+// =========================
+// Delete Review
+// =========================
 export const deleteReview = async (
   id: string
 ): Promise<Review> => {
